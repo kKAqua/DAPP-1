@@ -31,6 +31,14 @@
             cursor: pointer;
             margin-top: 20px;
         }
+        #Asset_verify {
+            padding: 10px 20px;
+            background-color: #4c86af;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
         input {
             padding: 10px;
             margin: 5px;
@@ -48,13 +56,27 @@
     <h1>Mint Your NTU Token</h1>
     <button id="connectButton">Connect to MetaMask</button>
     <div id="mintSection" class="hidden">
-        <p>Cost per $NTU token: <span id="cost">-</span> ETH (Free for Whitelisted/Creator wallet)</p>
+        <p>Cost per $NTU token: <span id="cost">-</span> ETH </p>
         <p>Max Mint Amount: <span id="maxMintAmount">-</span></p>
 		<p>Current Supply: <span id="totalSupply">-</span> / <span id="maxSupply">-</span></p>
         <input type="number" id="mintAmount" placeholder="Amount" min="1" max="2" value="1">
         <button id="mintButton">Mint</button>
 	    <button id="whitelist_check">Whitelist Check</button>
 		<br> 
+        <button id="Asset_verify">Asset Verify</button>
+		<br>
+
+		<label for="tokenDropdown">select your token: </label>
+		<select id="tokenDropdown">
+			<option value="">--select token--</option>
+		</select>
+		<br>
+		<label for="addressInput">transfer to: </label>
+		<input type="text" id="addressInput" placeholder="0x########" style="width:380px; height:6px;">
+		<br>
+		<button id="transfer">transfer</button>
+
+
 		<p>Trade on the secondary market:</p>
 		<a href="https://testnets.opensea.io/collection/ntu-token">
 			<img src="https://testnets.opensea.io/static/images/logos/opensea-logo.svg" height="42" width="42">
@@ -73,6 +95,7 @@
         let account;
         let contract;
         let isWhitelisted = false;
+        let isHolder = false;
 
 
         const contractAddress = '0xd86E2e2DC26E19F318737849d9FE4A229241Ca38';
@@ -929,6 +952,7 @@
                     
                     // Check if account is whitelisted
                     isWhitelisted = await contract.methods.whitelisted(account).call();
+                    Owner = await contract.methods.owner().call();
 
                     // Get contract info
                     const cost = await contract.methods.cost().call();
@@ -936,7 +960,7 @@
 					const totalSupply = await contract.methods.totalSupply().call();
 					const maxSupply = await contract.methods.maxSupply().call();
                     
-                    document.getElementById('cost').innerText = isWhitelisted ? "Free (Whitelisted)" : web3.utils.fromWei(cost, 'ether');
+                    document.getElementById('cost').innerText = isWhitelisted||(Owner==account) ? "Free (Whitelisted)" : web3.utils.fromWei(cost, 'ether');
                     document.getElementById('maxMintAmount').innerText = maxMintAmount;
 					document.getElementById('totalSupply').innerText = totalSupply;
 					document.getElementById('maxSupply').innerText = maxSupply;
@@ -988,6 +1012,50 @@
 				alert('You are not whitelisted by NTU!');
             }
 		};
+
+
+        document.getElementById('Asset_verify').onclick = async () => {
+			isHolder = await contract.methods.verifyAsset(account).call();
+            const assets = await contract.methods.walletOfOwner(account).call();
+			if(isHolder){
+
+                alert('You hold NTU tokens: ' + assets);
+            }
+
+            else{
+                alert('You are not NTU holder! ' + assets);
+            }
+
+			const dropdown = document.getElementById("tokenDropdown");
+            dropdown.innerHTML = ""; 
+
+            assets.forEach(function(user) {
+                let option = document.createElement("option");
+                option.text = user;
+                option.value = user;
+                dropdown.add(option);
+            });
+
+
+
+		};
+
+        document.getElementById('transfer').onclick = async () => {
+
+
+			const selectedtoken = document.getElementById("tokenDropdown").value;
+            const toAddress = document.getElementById("addressInput").value;
+
+            try{
+				
+				await contract.methods.safeTransferFrom(account, toAddress, selectedtoken).send({ from: account });
+				alert("Successfully transferred")
+			}catch (error) {
+                console.error('Error transfering tokens', error);
+            }
+			
+
+        };
 		
 
     </script>

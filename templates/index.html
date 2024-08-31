@@ -64,7 +64,8 @@
 	    <button id="whitelist_check">Whitelist Check</button>
 		<br> 
         <button id="Asset_verify">Asset Verify</button>
-		<br><br>
+		<br>
+		<br>
 
 		<label for="tokenDropdown">select your token: </label>
 		<select id="tokenDropdown">
@@ -98,7 +99,7 @@
         let isHolder = false;
 
 
-        const contractAddress = '0xd86E2e2DC26E19F318737849d9FE4A229241Ca38';
+        const contractAddress = '0xf9b640f0e9f59f993bd09073434c44315905ee19';
         const contractABI = [
 	{
 		"inputs": [
@@ -491,6 +492,39 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_newmaxSupply",
+				"type": "uint256"
+			}
+		],
+		"name": "setmaxSupply",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "setnewpresale",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_newpresalePeriod",
+				"type": "uint256"
+			}
+		],
+		"name": "setpresalePeriod",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -764,6 +798,19 @@
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "presalePeriod",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

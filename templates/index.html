@@ -61,12 +61,12 @@
     </style>
 </head>
 <body>
-    <h1>Mint Your NTU Token</h1>
+    <h1>Decentralized NTU Ticketing System</h1>
     <button id="connectButton">Connect to MetaMask</button>
     <div id="mintSection" class="hidden">
 		<button id="Current_state">Current state</button>
 		<br>
-        <p>Cost per $NTU token: <span id="cost">-</span> ETH </p>
+        <p>Cost per $NTU token: <span id="cost">-</span></p>
         <p>Max Mint Amount: <span id="maxMintAmount">-</span></p>
 		<p>Current Supply: <span id="totalSupply">-</span> / <span id="maxSupply">-</span></p>
         <input type="number" id="mintAmount" placeholder="Amount" min="1" max="2" value="1">
@@ -1002,7 +1002,9 @@
                     // Get the user's account
                     const accounts = await web3.eth.getAccounts();
                     account = accounts[0];
-                    document.getElementById('connectButton').innerText = `Connected: ${account}`;
+					m_account = hide_addr (account,6,5)
+
+                    document.getElementById('connectButton').innerText = `Connected: ${m_account}`;
                     
                     // Initialize contract
                     contract = new web3.eth.Contract(contractABI, contractAddress);
@@ -1017,7 +1019,7 @@
 					const totalSupply = await contract.methods.totalSupply().call();
 					const maxSupply = await contract.methods.maxSupply().call();
                     
-                    document.getElementById('cost').innerText = isWhitelisted||(Owner==account) ? "Free (Whitelisted)" : web3.utils.fromWei(cost, 'ether');
+                    document.getElementById('cost').innerText = isWhitelisted||(Owner==account) ? "Free" : web3.utils.fromWei(cost, 'ether')+" ETH";
                     document.getElementById('maxMintAmount').innerText = maxMintAmount;
 					document.getElementById('totalSupply').innerText = totalSupply;
 					document.getElementById('maxSupply').innerText = maxSupply;
@@ -1036,10 +1038,21 @@
         };
 
 
+		function hide_addr (str,frontLen,endLen) {
+			var len = str.length-frontLen-endLen;
+			var xing = '****';
+			return str.substring(0,frontLen)+xing+str.substring(str.length-endLen);
+		}
+
+
         document.getElementById('mintButton').onclick = async () => {
             const mintAmount = document.getElementById('mintAmount').value;
             let totalCost = '0';
 			Owner = await contract.methods.owner().call();
+			let pre_sale = await contract.methods.check_presale().call();
+			if(pre_sale&&!isWhitelisted){
+				alert("You are not whitelisted!");
+			}
 
             if (!isWhitelisted && account != Owner) {
                 const cost = await contract.methods.cost().call();

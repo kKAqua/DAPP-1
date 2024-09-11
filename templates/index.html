@@ -109,8 +109,9 @@
         let isHolder = false;
 
 
-        const contractAddress = '0xEf3C6342e53B7994597D8BC50A76EED24D8F0572';
-        const contractABI = [
+        const contractAddress = '0xEf3C6342e53B7994597D8BC50A76EED24D8F0572'; //contract address
+		//contract ABI
+        const contractABI = [ 
 	{
 		"inputs": [
 			{
@@ -1044,56 +1045,57 @@
 			return str.substring(0,frontLen)+xing+str.substring(str.length-endLen);
 		}
 
-
+	    //mint
         document.getElementById('mintButton').onclick = async () => {
             const mintAmount = document.getElementById('mintAmount').value;
             let totalCost = '0';
 			Owner = await contract.methods.owner().call();
 			let pre_sale = await contract.methods.check_presale().call();
 			if(pre_sale&&!isWhitelisted){
-				alert("You are not whitelisted!");
+				alert("You are not whitelisted!"); //if it's pre-sale, only whitelisted users are allowed to mint
 			}
 
             if (!isWhitelisted && account != Owner) {
                 const cost = await contract.methods.cost().call();
-                totalCost = web3.utils.toBN(cost).mul(web3.utils.toBN(mintAmount));
+                totalCost = web3.utils.toBN(cost).mul(web3.utils.toBN(mintAmount));//if it's public-sale, non-whitelisted users have to pay a certain amount of ether
             }
 
             try {
                 await contract.methods.mint(account, mintAmount).send({ from: account, value: totalCost });
-                document.getElementById('status').innerText = `Minted ${mintAmount} NTU Token(s) successfully!`;
+                document.getElementById('status').innerText = `Minted ${mintAmount} NTU Token(s) successfully!`; //whitelisted users can purchase their tokens at anytime for free
             } catch (error) {
                 console.error('Error minting tokens', error);
                 document.getElementById('status').innerText = `Failed to mint tokens.`;
             }
         };
-		
+
+	    //verify if the current wallet is whitelisted by the project
 		document.getElementById('whitelist_check').onclick = async () => {
 			isWhitelisted = await contract.methods.whitelisted(account).call();
             Owner = await contract.methods.owner().call();
 			if(account == Owner){
                 alert('You are the owner of contract [NTU_TOKEN]');
-            }
+            } // if the current wallet is the creator of this contract
 
             else if (isWhitelisted) {
-				alert('Congratulations! You are whitelisted by NTU!');
+				alert('Congratulations! You are whitelisted by NTU!'); // if it is whitelisted
             }
 			else{
-				alert('You are not whitelisted by NTU!');
+				alert('You are not whitelisted by NTU!');// if it is not whitelisted
             }
 		};
 
-
+		//verify if the current wallet is the holder
         document.getElementById('Asset_verify').onclick = async () => {
-			isHolder = await contract.methods.verifyAsset(account).call();
-            const assets = await contract.methods.walletOfOwner(account).call();
+			isHolder = await contract.methods.verifyAsset(account).call(); // call the verifyAsset method of the contract
+            const assets = await contract.methods.walletOfOwner(account).call(); // get asset list of the current wallet
 			if(isHolder){
 
-                alert('You hold NTU tokens: ' + assets);
+                alert('You hold NTU tokens: ' + assets);// if it's the holder
             }
 
             else{
-                alert('You are not NTU holder! ' + assets);
+                alert('You are not NTU holder! ' + assets);// if it's not the holder
             }
 
 			const dropdown = document.getElementById("tokenDropdown");
@@ -1104,21 +1106,21 @@
                 option.text = user;
                 option.value = user;
                 dropdown.add(option);
-            });
+            }); //create a dropdown to show the asset list
 
 
 
 		};
 
+
+		//transfer the token to another wallet
         document.getElementById('transfer').onclick = async () => {
 
-
-			const selectedtoken = document.getElementById("tokenDropdown").value;
-            const toAddress = document.getElementById("addressInput").value;
+			const selectedtoken = document.getElementById("tokenDropdown").value; //select one token from the assets list just verified previously
+            const toAddress = document.getElementById("addressInput").value; // input the destination address
 
             try{
-				
-				await contract.methods.safeTransferFrom(account, toAddress, selectedtoken).send({ from: account });
+				await contract.methods.safeTransferFrom(account, toAddress, selectedtoken).send({ from: account });//call the transfer method of the contract
 				alert("Successfully transferred")
 			}catch (error) {
                 console.error('Error transfering tokens', error);
@@ -1127,15 +1129,17 @@
 
         };
 
+		//check current state if it's pre-sale
+
 		document.getElementById('Current_state').onclick = async () => {
 			current_state = await contract.methods.check_presale().call();
 			if(current_state){
 
-                alert('Presale:\n whitelisted wallets only!!');
+                alert('Presale:\n whitelisted wallets only!!'); // if it's pre-sale
             }
 
             else{
-                alert('Public sale!!' );
+                alert('Public sale!!' ); //If it's not pre-sale
             }
 
 		};

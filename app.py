@@ -6,7 +6,7 @@ app=Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/secondary',methods=["get","post"])
+@app.route('/second',methods=["get","post"])
 def second():
     return render_template('second.html')
 

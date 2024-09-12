@@ -53,7 +53,7 @@
         </div>
         
         <div class="section">
-            <h2>Batch List NFTs</h2>
+            <h2>Batch List Your NFTs</h2>
             <input type="text" id="batchNftAddressInput" placeholder="NFT Contract Address">
             <input type="text" id="batchTokenIdsInput" placeholder="Token IDs (comma-separated)">
             <input type="number" id="batchPriceInput" placeholder="Price in Wei">
@@ -61,14 +61,14 @@
         </div>
         
         <div class="section">
-            <h2>Remove Listing</h2>
+            <h2>Remove Your NFT</h2>
             <input type="text" id="nftRemoveAddressInput" placeholder="NFT Contract Address">
             <input type="number" id="removeTokenIdInput" placeholder="Token ID">
             <button id="removeButton">Remove Listing</button>
         </div>
 
         <div class="section">
-            <h2>Batch Remove Listings</h2>
+            <h2>Batch Remove Your NFTs</h2>
             <input type="text" id="batchRemoveAddressInput" placeholder="NFT Contract Address">
             <input type="text" id="batchRemoveTokenIdsInput" placeholder="Token IDs (comma-separated)">
             <button id="batchRemoveButton">Batch Remove Listings</button>
@@ -549,10 +549,10 @@
             const tokenId = document.getElementById('removeTokenIdInput').value;
             try {
                 await contract.methods.remove(nftAdd, tokenId).send({ from: account });
-                document.getElementById('status').innerText = 'Listing removed successfully!';
+                document.getElementById('status').innerText = 'NFT removed successfully!';
             } catch (error) {
                 console.error('Error removing listing', error);
-                document.getElementById('status').innerText = 'Failed to remove listing.';
+                document.getElementById('status').innerText = 'Failed to remove NFT.';
             }
         }
 
@@ -561,10 +561,10 @@
             const tokenIds = document.getElementById('batchRemoveTokenIdsInput').value.split(',').map(id => parseInt(id.trim()));
             try {
                 await contract.methods.batch_remove(nftAdd, tokenIds).send({ from: account });
-                document.getElementById('status').innerText = 'Batch listings removed successfully!';
+                document.getElementById('status').innerText = 'Batch NFTs removed successfully!';
             } catch (error) {
                 console.error('Error removing batch listings', error);
-                document.getElementById('status').innerText = 'Failed to batch remove listings.';
+                document.getElementById('status').innerText = 'Failed to batch remove NFTs.';
             }
         }
 
